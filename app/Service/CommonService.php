@@ -17,6 +17,7 @@ class CommonService
     ): Collection {
         try {
             $data = $model
+                ->query()
                 ->select($select)
                 ->with($with)
                 ->orderBy('id', $orderBy)
@@ -39,9 +40,17 @@ class CommonService
     ): LengthAwarePaginator {
         try {
             $data = $model
+                ->query()
                 ->select($select)
-                ->with($with)
-                ->Search($search)
+                ->with($with);
+
+
+            if ($search) {
+                $data = $data
+                    ->Search($search);
+            }
+
+            $data = $data
                 ->orderBy('id', $orderBy)
                 ->paginate($perPage);
 
@@ -60,6 +69,7 @@ class CommonService
     ): Model {
         try {
             $data = $model
+                ->query()
                 ->select($select)
                 ->with($with)
                 ->findOrFail($id);

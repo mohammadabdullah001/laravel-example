@@ -6,9 +6,9 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\User\UserResource;
-use App\Repository\User\UserRepositoryInterface;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use App\Repository\User\Interfaces\UserRepositoryInterface;
 
 class UserController extends Controller
 {

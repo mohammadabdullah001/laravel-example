@@ -4,8 +4,8 @@ namespace App\Repository\User;
 
 use App\Models\User;
 use App\Service\CommonService;
-use App\Repository\BaseRepository;
-use App\Repository\User\UserRepositoryInterface;
+use App\Repository\Base\BaseRepository;
+use App\Repository\User\Interfaces\UserRepositoryInterface;
 
 class UserRepository extends BaseRepository implements UserRepositoryInterface
 {

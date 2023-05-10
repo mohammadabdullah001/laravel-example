@@ -5,15 +5,18 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Trait\Searchable;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\MediaLibrary\HasMedia;
 use Illuminate\Notifications\Notifiable;
+use Spatie\MediaLibrary\InteractsWithMedia;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements HasMedia
 {
     use HasApiTokens, HasFactory, Notifiable;
     use Searchable;
+    use InteractsWithMedia;
 
     /**
      * The attributes that are mass assignable.
@@ -55,5 +58,12 @@ class User extends Authenticatable
     public function designation(): BelongsTo
     {
         return $this->belongsTo(Designation::class, 'designation_id', 'id');
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('avatar')
+            ->withResponsiveImages()
+            ->singleFile();
     }
 }

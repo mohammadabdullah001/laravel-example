@@ -14,12 +14,15 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory(1000)->create()->each(function ($user) {
-            $user->update(
-                [
-                    'designation_id' => Designation::inRandomOrder()->first()->id
-                ]
-            );
-        });
+        User::factory()
+            ->count(10)
+            ->create()
+            ->each(function ($user) {
+                $user->update(
+                    [
+                        'designation_id' => Designation::inRandomOrder()->first()->id
+                    ]
+                );
+            });
     }
 }

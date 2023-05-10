@@ -20,6 +20,7 @@ class UserResource extends JsonResource
             'id' => $this->when($this->id, $this->id),
             'name' =>  $this->when($this->name, $this->name),
             'email' => $this->when($this->email, $this->email),
+            'avatar' => $this->getFirstMediaUrl('avatar'),
             'designation_id' => $this->when(
                 $this->designation_id,
                 $this->designation_id

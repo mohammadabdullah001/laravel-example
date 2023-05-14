@@ -19,6 +19,13 @@ class UserController extends Controller
         $this->repository = $repository;
     }
 
+    public function user(): JsonResource
+    {
+        $data = auth()->user();
+
+        return new UserResource($data);
+    }
+
     public function all(Request $request): ResourceCollection
     {
         $select = explode(

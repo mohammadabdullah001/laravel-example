@@ -14,7 +14,7 @@ class DesignationSeeder extends Seeder
     public function run(): void
     {
         Designation::factory()
-            ->count(10)
+            ->count(100)
             ->create();
     }
 }

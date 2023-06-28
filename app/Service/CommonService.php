@@ -2,9 +2,11 @@
 
 namespace App\Service;
 
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class CommonService
 {
@@ -68,6 +70,7 @@ class CommonService
         $with,
     ): Model {
         try {
+
             $data = $model
                 ->query()
                 ->select($select)
@@ -75,9 +78,9 @@ class CommonService
                 ->findOrFail($id);
 
             return $data;
-        } catch (\Throwable $th) {
-            info($th);
-            abort(404, 'Not Found');
+        } catch (HttpException $th) {
+            Log::error($th);
+            abort($th->getStatusCode(), $th->getMessage());
         }
     }
 }

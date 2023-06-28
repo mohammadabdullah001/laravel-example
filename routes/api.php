@@ -28,6 +28,6 @@ Route::prefix('admin')->group(function () {
         ->group(function () {
             Route::get('user', 'user');
             Route::get('users/all', 'all');
+            Route::apiResource('users', UserController::class);
         });
-    Route::apiResource('users', UserController::class);
 });

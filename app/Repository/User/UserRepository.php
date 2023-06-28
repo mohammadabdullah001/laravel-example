@@ -68,4 +68,40 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
 
         return $data;
     }
+
+    public function store(
+        $request
+    ) {
+        $data = $this->commonService->store(
+            $this->model,
+            $request
+        );
+
+        return $data;
+    }
+
+
+    public function update(
+        $id,
+        $request
+    ) {
+        $data = $this->commonService->update(
+            $this->model,
+            $id,
+            $request
+        );
+
+        return $data;
+    }
+
+    public function destroy(
+        $id
+    ) {
+        $data = $this->commonService->destroy(
+            $this->model,
+            $id
+        );
+
+        return $data;
+    }
 }

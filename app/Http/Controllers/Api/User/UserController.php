@@ -74,7 +74,9 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data = $this->repository->store($request);
+
+        return new UserResource($data);
     }
 
     /**
@@ -100,16 +102,21 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request,  $id)
     {
-        //
+
+        $data = $this->repository->update($id, $request);
+
+        return new UserResource($data);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(User $user)
+    public function destroy($id)
     {
-        //
+        $this->repository->destroy($id);
+
+        return response()->noContent();
     }
 }

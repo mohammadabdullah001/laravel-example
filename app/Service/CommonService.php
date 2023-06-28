@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Hash;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class CommonService
@@ -78,6 +79,68 @@ class CommonService
                 ->findOrFail($id);
 
             return $data;
+        } catch (HttpException $th) {
+            Log::error($th);
+            abort($th->getStatusCode(), $th->getMessage());
+        }
+    }
+    public function store(
+        $model,
+        $request
+    ): Model {
+        try {
+
+            $data = $model
+                ->query()
+                ->create([
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'password' => Hash::make($request->password),
+                ]);
+
+
+            return $data;
+        } catch (HttpException $th) {
+            Log::error($th);
+            abort($th->getStatusCode(), $th->getMessage());
+        }
+    }
+    public function update(
+        $model,
+        $id,
+        $request
+    ): Model {
+        try {
+
+            $model = $model
+                ->query()
+                ->where('id', $id)
+                ->first();
+
+            $model->update([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
+
+
+            return $model->fresh();
+        } catch (HttpException $th) {
+            Log::error($th);
+            abort($th->getStatusCode(), $th->getMessage());
+        }
+    }
+
+    public function destroy(
+        $model,
+        $id
+    ): void {
+        try {
+
+            $model
+                ->query()
+                ->where('id', $id)
+                ->delete();
         } catch (HttpException $th) {
             Log::error($th);
             abort($th->getStatusCode(), $th->getMessage());

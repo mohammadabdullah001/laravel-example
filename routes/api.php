@@ -1,9 +1,11 @@
 <?php
 
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\User\UserController;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,4 +32,22 @@ Route::prefix('admin')->group(function () {
             Route::get('users/all', 'all');
             Route::apiResource('users', UserController::class);
         });
+});
+
+
+Route::prefix('redis')->group(function () {
+    Route::post('users', function () {
+        $users = User::all();
+        Cache::store('redis')->put('users',  $users);
+        return "Redis Cache";
+    });
+    Route::get('users', function () {
+        $users =  Cache::store('redis')->get('users');
+
+        return collect($users)->whereNull('designation_id')->values();
+    });
+    Route::post('flush', function () {
+        Cache::flush();
+        return "Redis flush";
+    });
 });

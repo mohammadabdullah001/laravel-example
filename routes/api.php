@@ -37,21 +37,35 @@ Route::prefix('admin')->group(function () {
 
 
 Route::prefix('redis')->group(function () {
-    Route::post('users', function () {
-        $users = User::all();
-        Cache::store('redis')->put('users',  $users);
-        return "Redis Cache";
+    Route::post('users/cache', function () {
+        $users = User::latest()->get();
+
+        $array = [];
+        foreach ($users as $user) {
+            $array["user:$user->id"] = $user;
+        }
+
+        Redis::rpush('users', $array);
+
+        return response()->json("Redis Cache");
+    });
+    Route::post('users', function (Request $request) {
+        $user = User::create($request->all());
+        Redis::lpush('users',  $user);
+
+        return response()->json($user);
     });
     Route::get('users', function () {
-        $users =  Cache::store('redis')->get('users');
-
-        return collect($users)->whereNull('designation_id')->values();
+        $users = Redis::lrange('users', 0, -1);
+        // $users = Redis::get('users');
+        return response()->json($users);
     });
-    Route::get('user/{id}', function ($id) {
-        return Redis::hget('users', $id);
+    Route::delete('user/{user}', function (User $user) {
+        return Redis::lrem('users', 0, "user:$user->id");
     });
     Route::post('flush', function () {
-        Cache::store('redis')->flush();
-        return "Redis flush";
+        // Cache::store('redis')->flush();
+        Redis::del('users');
+        return response()->json("Redis flush");
     });
 });

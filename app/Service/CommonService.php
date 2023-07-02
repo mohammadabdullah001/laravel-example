@@ -3,10 +3,11 @@
 namespace App\Service;
 
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\Hash;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class CommonService
@@ -17,14 +18,19 @@ class CommonService
         $select,
         $with,
         $orderBy
-    ): Collection {
+    ) {
         try {
-            $data = $model
-                ->query()
-                ->select($select)
-                ->with($with)
-                ->orderBy('id', $orderBy)
-                ->get();
+
+
+            $data =  Cache::store('redis')->remember('users', null, function () use ($model, $select, $with, $orderBy) {
+                return $model
+                    ->query()
+                    ->select($select)
+                    ->with($with)
+                    ->orderBy('id', $orderBy)
+                    ->get();
+            });
+
 
             return $data;
         } catch (\Throwable $th) {
@@ -139,7 +145,7 @@ class CommonService
 
             $model
                 ->query()
-                ->where('id', $id)
+                ->find($id)
                 ->delete();
         } catch (HttpException $th) {
             Log::error($th);

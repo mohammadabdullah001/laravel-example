@@ -3,6 +3,7 @@
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\User\UserController;
@@ -46,8 +47,11 @@ Route::prefix('redis')->group(function () {
 
         return collect($users)->whereNull('designation_id')->values();
     });
+    Route::get('user/{id}', function ($id) {
+        return Redis::hget('users', $id);
+    });
     Route::post('flush', function () {
-        Cache::flush();
+        Cache::store('redis')->flush();
         return "Redis flush";
     });
 });

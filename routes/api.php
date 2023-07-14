@@ -69,3 +69,239 @@ Route::prefix('redis')->group(function () {
         return response()->json("Redis flush");
     });
 });
+
+Route::prefix('cache')->group(function () {
+    Route::post('put', function (Request $request) {
+        $name = $request->input('name');
+
+        $user = user::where(['name' => $name])->first();
+
+        $userData = [
+            'id' => @$user->id,
+            'name' => @$user->name,
+        ];
+
+        $isCache =  Cache::put('user:' . $name, $userData, $seconds = null);
+
+        if ($isCache) {
+            $data = "Cache Yes";
+        } else {
+            $data = "Cache No";
+        }
+
+        return response()->json($data);
+    });
+    Route::post('add', function (Request $request) {
+        $name = $request->input('name');
+
+        $user = user::where(['name' => $name])->first();
+
+        $userData = [
+            'id' => @$user->id,
+            'name' => @$user->name,
+        ];
+
+        $isCache =  Cache::add('user:' . $name, $userData, $seconds = null);
+
+
+        if ($isCache) {
+            $data = "Cache Yes";
+        } else {
+            $data = "Cache No";
+        }
+
+        return response()->json($data);
+    });
+
+    Route::post('forever', function (Request $request) {
+        $name = $request->input('name');
+
+        $user = user::where(['name' => $name])->first();
+
+        $userData = [
+            'id' => @$user->id,
+            'name' => @$user->name,
+        ];
+
+        Cache::forever('user:' . $name, $userData);
+
+        return response()->json('Cache forever');
+    });
+
+    Route::get('remember', function (Request $request) {
+        $name = $request->query('name');
+        $user =  Cache::remember('user:' . $name, $seconds = null, function () use ($name) {
+            $user =  user::where([
+                'name' => $name
+            ])->first();
+
+            return [
+                'id' => @$user->id,
+                'name' => @$user->name,
+            ];
+        });
+
+        return response()->json($user);
+    });
+
+    Route::get('has', function (Request $request) {
+        $name = $request->query('name');
+
+        if (Cache::has('user:' . $name)) {
+            $data = "Yes";
+        } else {
+            $data = "No";
+        }
+
+        return response()->json($data);
+    });
+    Route::get('get', function (Request $request) {
+        $name = $request->query('name');
+
+        $data = Cache::get('user:' . $name);
+
+        return response()->json($data);
+    });
+
+    Route::delete('forget/{key}', function ($key) {
+        Cache::forget('user:' . $key);
+
+        return response()->json("Cache delete: " . $key);
+    });
+
+    Route::post('flush', function () {
+        Cache::flush();
+
+        return response()->json("Cache flush");
+    });
+});
+
+
+Route::prefix('database-cache')->group(function () {
+    Route::post('lock', function (Request $request) {
+        $name = $request->input('name');
+
+
+        Cache::store('database')->lock('processing', 10)->block(5, function () use ($name) {
+            return $name;
+        });
+
+        return "ok";
+    });
+    Route::post('forever', function (Request $request) {
+        $name = $request->input('name');
+
+        $user = user::where(['name' => $name])->first();
+
+        $userData = [
+            'id' => @$user->id,
+            'name' => @$user->name,
+        ];
+
+        return Cache::store('database')->forever('user:' . $name, $userData);
+    });
+
+    Route::post('put', function (Request $request) {
+        $name = $request->input('name');
+
+        $user = user::where(['name' => $name])->first();
+
+        $userData = [
+            'id' => @$user->id,
+            'name' => @$user->name,
+        ];
+
+        $isCache =  Cache::store('database')->put('user:' . $name, $userData, $seconds = null);
+
+        if ($isCache) {
+            $data = "Cache Yes";
+        } else {
+            $data = "Cache No";
+        }
+
+        return response()->json($data);
+    });
+    Route::post('add', function (Request $request) {
+        $name = $request->input('name');
+
+        $user = user::where(['name' => $name])->first();
+
+        $userData = [
+            'id' => @$user->id,
+            'name' => @$user->name,
+        ];
+
+        $isCache =  Cache::store('database')->add('user:' . $name, $userData, $seconds = null);
+
+
+        if ($isCache) {
+            $data = "Cache Yes";
+        } else {
+            $data = "Cache No";
+        }
+
+        return response()->json($data);
+    });
+
+    Route::post('forever', function (Request $request) {
+        $name = $request->input('name');
+
+        $user = user::where(['name' => $name])->first();
+
+        $userData = [
+            'id' => @$user->id,
+            'name' => @$user->name,
+        ];
+
+        Cache::store('database')->forever('user:' . $name, $userData);
+
+        return response()->json('Cache forever');
+    });
+
+    Route::get('remember', function (Request $request) {
+        $name = $request->query('name');
+        $user =  Cache::store('database')->remember('user:' . $name, $seconds = null, function () use ($name) {
+            $user =  user::where([
+                'name' => $name
+            ])->first();
+
+            return [
+                'id' => @$user->id,
+                'name' => @$user->name,
+            ];
+        });
+
+        return response()->json($user);
+    });
+
+    Route::get('has', function (Request $request) {
+        $name = $request->query('name');
+
+        if (Cache::store('database')->has('user:' . $name)) {
+            $data = "Yes";
+        } else {
+            $data = "No";
+        }
+
+        return response()->json($data);
+    });
+    Route::get('get', function (Request $request) {
+        $name = $request->query('name');
+
+        $data = Cache::store('database')->get('user:' . $name);
+
+        return response()->json($data);
+    });
+
+    Route::delete('forget/{key}', function ($key) {
+        Cache::store('database')->forget('user:' . $key);
+
+        return response()->json("Cache delete: " . $key);
+    });
+
+    Route::post('flush', function () {
+        Cache::store('database')->flush();
+
+        return response()->json("Cache flush");
+    });
+});

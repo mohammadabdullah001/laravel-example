@@ -22,6 +22,12 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make(123456),
         ]);
 
+        \App\Models\User::factory()->create([
+            'name' => 'customer',
+            'email' => 'customer@example.com',
+            'password' => Hash::make(123456),
+        ]);
+
         $this->call([
             DesignationSeeder::class,
             UserSeeder::class,

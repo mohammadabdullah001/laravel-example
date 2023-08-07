@@ -42,6 +42,13 @@ return [
             'serialize' => false,
         ],
 
+        'database_examples' => [
+            'driver' => 'database',
+            'table' => 'cache_examples',
+            'connection' => null,
+            'lock_connection' => null,
+        ],
+
         'database' => [
             'driver' => 'database',
             'table' => 'cache',
@@ -105,6 +112,6 @@ return [
     |
     */
 
-    'prefix' => env('CACHE_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_cache_'),
+    'prefix' => env('CACHE_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_') . '_cache_'),
 
 ];

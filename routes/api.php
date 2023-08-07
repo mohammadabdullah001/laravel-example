@@ -1,7 +1,10 @@
 <?php
 
 use App\Models\User;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Jobs\SortUrl\SortUrlJob;
+use Illuminate\Support\Benchmark;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Route;
@@ -18,6 +21,12 @@ use App\Http\Controllers\Api\User\UserController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+
+Route::get('response-per-minute', function () {
+    return response()->json([
+        'data' => 'ok'
+    ]);
+});
 
 Route::prefix('admin')->group(function () {
     Route::controller(AuthController::class)->group(function () {
@@ -303,5 +312,31 @@ Route::prefix('database-cache')->group(function () {
         Cache::store('database')->flush();
 
         return response()->json("Cache flush");
+    });
+});
+
+
+Route::prefix('sort-url')->group(function () {
+    Route::get('/', function (Request $request) {
+        $name = $request->query('name');
+
+        $user =  Cache::store('database_examples')->rememberForever('user:' . $name, function () use ($name) {
+            $user =  user::where([
+                'name' => $name
+            ])->first();
+
+            return [
+                'id' => @$user->id,
+                'name' => @$user->name,
+            ];
+        });
+
+
+        // Benchmark::dd([
+        //     'Scenario 1' => fn () => SortUrlJob::dispatch($user),
+        //     'Scenario 2' => fn () => SortUrlJob::dispatchAfterResponse($user),
+        // ]);
+
+        return redirect('https://www.facebook.com');
     });
 });

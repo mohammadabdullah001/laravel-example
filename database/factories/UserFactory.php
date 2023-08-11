@@ -20,7 +20,8 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
+            'first_name' => fake()->firstName(),
+            'last_name' => fake()->lastName(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => Hash::make('password'),
@@ -41,13 +42,13 @@ class UserFactory extends Factory
     /**
      * Configure the model factory.
      */
-    public function configure(): static
-    {
-        return $this->afterCreating(function (User $user) {
-            $url = 'https://source.unsplash.com/random/1200x800';
-            $user
-                ->addMediaFromUrl($url)
-                ->toMediaCollection('avatar');
-        });
-    }
+    // public function configure(): static
+    // {
+    //     return $this->afterCreating(function (User $user) {
+    //         $url = 'https://source.unsplash.com/random/1200x800';
+    //         $user
+    //             ->addMediaFromUrl($url)
+    //             ->toMediaCollection('avatar');
+    //     });
+    // }
 }

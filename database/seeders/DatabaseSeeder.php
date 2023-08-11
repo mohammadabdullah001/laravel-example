@@ -16,21 +16,27 @@ class DatabaseSeeder extends Seeder
     {
         // \App\Models\User::factory(1000)->create();
 
-        \App\Models\User::factory()->create([
-            'name' => 'admin',
-            'email' => 'admin@example.com',
-            'password' => Hash::make(123456),
-        ]);
+        // \App\Models\User::factory()->create([
+        //     'name' => 'admin',
+        //     'email' => 'admin@example.com',
+        //     'password' => Hash::make(123456),
+        // ]);
 
-        \App\Models\User::factory()->create([
-            'name' => 'customer',
-            'email' => 'customer@example.com',
-            'password' => Hash::make(123456),
-        ]);
+        // \App\Models\User::factory()->create([
+        //     'name' => 'customer',
+        //     'email' => 'customer@example.com',
+        //     'password' => Hash::make(123456),
+        // ]);
+
+        // $this->call([
+        //     DesignationSeeder::class,
+        //     UserSeeder::class,
+        // ]);
 
         $this->call([
-            DesignationSeeder::class,
             UserSeeder::class,
+            DepartmentSeeder::class,
+            EmployeeSeeder::class,
         ]);
     }
 }

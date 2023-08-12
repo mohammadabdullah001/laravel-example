@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Database\Query\JoinClause;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\User\UserController;
 
@@ -345,30 +346,125 @@ Route::prefix('sort-url')->group(function () {
 
     Route::get('/visitors', function (Request $request) {
 
-        $fromDate = Carbon::make($request->query('fromDate'))->format('Y-m-d');
-        $toDate = Carbon::make($request->query('toDate'))->format('Y-m-d');
+        // $fromDate = Carbon::make($request->query('fromDate'))->format('Y-m-d');
+        // $toDate = Carbon::make($request->query('toDate'))->format('Y-m-d');
+
+        // return ShortUrl::query()
+        //     ->when($fromDate && $toDate, function ($query) use ($fromDate, $toDate) {
+        //         $query->with([
+        //             'VisitorCountries' => function ($q) use ($fromDate, $toDate) {
+        //                 $q->select('short_url_id', 'country')
+        //                     ->selectRaw('SUM(total_count) as total_count')
+        //                     ->whereBetween('visit_at', [$fromDate, $toDate])
+        //                     ->groupBy('short_url_id', 'country', 'total_count')
+        //                     ->orderByDesc('total_count')
+        //                     ->limit(5);
+        //             },
+        //             'VisitorCities' => function ($q) use ($fromDate, $toDate) {
+        //                 $q->select('short_url_id', 'city')
+        //                     ->selectRaw('SUM(total_count) as total_count')
+        //                     ->whereBetween('visit_at', [$fromDate, $toDate])
+        //                     ->groupBy('short_url_id', 'city', 'total_count')
+        //                     ->orderByDesc('total_count')
+        //                     ->limit(5);
+        //             },
+        //         ]);
+        //     })
+        //     ->paginate(10);
+
+
+
+
 
         return ShortUrl::query()
-            ->when($fromDate && $toDate, function ($query) use ($fromDate, $toDate) {
-                $query->with([
-                    'VisitorCountries' => function ($q) use ($fromDate, $toDate) {
-                        $q->select('short_url_id', 'country')
-                            ->selectRaw('SUM(total_count) as total_count')
-                            ->whereBetween('visit_at', [$fromDate, $toDate])
-                            ->groupBy('short_url_id', 'country', 'total_count')
-                            ->orderByDesc('total_count')
-                            ->limit(5);
-                    },
-                    'VisitorCities' => function ($q) use ($fromDate, $toDate) {
-                        $q->select('short_url_id', 'city')
-                            ->selectRaw('SUM(total_count) as total_count')
-                            ->whereBetween('visit_at', [$fromDate, $toDate])
-                            ->groupBy('short_url_id', 'city', 'total_count')
-                            ->orderByDesc('total_count')
-                            ->limit(5);
-                    },
-                ]);
-            })
-            ->paginate(10);
+            ->with([
+                'VisitorCountries' => function ($q) {
+                    $q->select('short_url_id', 'country')
+                        ->selectRaw('SUM(total_count) as total_count')
+                        ->groupBy('short_url_id', 'country', 'total_count')
+                        ->orderByDesc('total_count')
+                        ->limit(5);
+                },
+                'VisitorCities' => function ($q) {
+                    $q->select('short_url_id', 'city')
+                        ->selectRaw('SUM(total_count) as total_count')
+                        ->groupBy('short_url_id', 'city', 'total_count')
+                        ->orderByDesc('total_count')
+                        ->limit(5);
+                },
+            ])
+
+            ->get();
+
+
+
+        // $visitorCountries = DB::table('visitor_countries')
+        //     ->select([
+        //         'short_url_id',
+        //         'country',
+        //         DB::raw('SUM(total_count) as total_count')
+        //     ])
+        //     ->groupBy('short_url_id', 'country')
+        //     ->orderByDesc('total_count');
+
+        // $originalData = DB::table('short_urls')
+        //     ->joinSub($visitorCountries, 'visitor_countries', function ($join) {
+        //         $join->on('short_urls.id', '=', 'visitor_countries.short_url_id');
+        //     })
+        //     ->select('short_urls.*', 'visitor_countries.*')
+        //     ->orderByDesc('short_urls.id')
+        //     ->orderByDesc('visitor_countries.total_count')
+        //     ->get();
+
+
+        // $transformedData = [];
+        // collect($originalData)
+        //     ->map(function ($item) use (&$transformedData) {
+
+
+        //         $id = $item->id;
+        //         $domain = $item->domain;
+
+        //         // Check if the id-domain combination already exists in transformedData
+        //         $existingItemKey = null;
+        //         foreach ($transformedData as $key => $existing) {
+        //             if ($existing['id'] == $id && $existing['domain'] == $domain) {
+        //                 $existingItemKey = $key;
+        //                 break;
+        //             }
+        //         }
+
+        //         // If it doesn't exist, create a new entry; otherwise, add the country data to the existing entry
+        //         if ($existingItemKey === null) {
+        //             $transformedItem = [
+        //                 'id' => $item->id,
+        //                 'domain' => $item->domain,
+        //                 'created_at' => $item->created_at,
+        //                 'updated_at' => $item->updated_at,
+        //                 'countries' => [
+        //                     [
+        //                         'short_url_id' => $item->short_url_id,
+        //                         'country' => $item->country,
+        //                         'total_count' => $item->total_count,
+        //                     ],
+        //                 ],
+        //             ];
+        //             $transformedData[] = $transformedItem;
+        //         } else {
+        //             if (count($transformedData[$existingItemKey]['countries']) <= 4) {
+        //                 $transformedData[$existingItemKey]['countries'][] = [
+        //                     'short_url_id' => $item->short_url_id,
+        //                     'country' => $item->country,
+        //                     'total_count' => $item->total_count,
+        //                 ];
+        //             }
+        //         }
+
+        //         return $transformedData;
+        //     })
+        //     ->values()
+        //     ->all();
+
+        // return  $transformedData;
     });
 });

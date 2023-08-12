@@ -33,10 +33,16 @@ class DatabaseSeeder extends Seeder
         //     UserSeeder::class,
         // ]);
 
+        // $this->call([
+        //     UserSeeder::class,
+        //     DepartmentSeeder::class,
+        //     EmployeeSeeder::class,
+        // ]);
+
         $this->call([
-            UserSeeder::class,
-            DepartmentSeeder::class,
-            EmployeeSeeder::class,
+            ShortUrlSeeder::class,
+            VisitorCountrySeeder::class,
+            VisitorCitySeeder::class,
         ]);
     }
 }

@@ -1,10 +1,13 @@
 <?php
 
+use Carbon\Carbon;
 use App\Models\User;
+use App\Models\ShortUrl;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Jobs\SortUrl\SortUrlJob;
 use Illuminate\Support\Benchmark;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Route;
@@ -338,5 +341,34 @@ Route::prefix('sort-url')->group(function () {
         // ]);
 
         return redirect('https://www.facebook.com');
+    });
+
+    Route::get('/visitors', function (Request $request) {
+
+        $fromDate = Carbon::make($request->query('fromDate'))->format('Y-m-d');
+        $toDate = Carbon::make($request->query('toDate'))->format('Y-m-d');
+
+        return ShortUrl::query()
+            ->when($fromDate && $toDate, function ($query) use ($fromDate, $toDate) {
+                $query->with([
+                    'VisitorCountries' => function ($q) use ($fromDate, $toDate) {
+                        $q->select('short_url_id', 'country')
+                            ->selectRaw('SUM(total_count) as total_count')
+                            ->whereBetween('visit_at', [$fromDate, $toDate])
+                            ->groupBy('short_url_id', 'country', 'total_count')
+                            ->orderByDesc('total_count')
+                            ->limit(5);
+                    },
+                    'VisitorCities' => function ($q) use ($fromDate, $toDate) {
+                        $q->select('short_url_id', 'city')
+                            ->selectRaw('SUM(total_count) as total_count')
+                            ->whereBetween('visit_at', [$fromDate, $toDate])
+                            ->groupBy('short_url_id', 'city', 'total_count')
+                            ->orderByDesc('total_count')
+                            ->limit(5);
+                    },
+                ]);
+            })
+            ->paginate(10);
     });
 });

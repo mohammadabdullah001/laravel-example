@@ -320,8 +320,8 @@ Route::prefix('database-cache')->group(function () {
 });
 
 
-Route::prefix('sort-url')->group(function () {
-    Route::get('/', function (Request $request) {
+Route::prefix('sort-urls')->group(function () {
+    Route::get('/redirect', function (Request $request) {
         $name = $request->query('name');
 
         $user =  Cache::store('database_examples')->rememberForever('user:' . $name, function () use ($name) {
@@ -344,7 +344,38 @@ Route::prefix('sort-url')->group(function () {
         return redirect('https://www.facebook.com');
     });
 
-    Route::get('/visitors', function (Request $request) {
+    Route::get('/', function (Request $request) {
+
+        $campaign_id =  data_get($request->all(), 'campaign_id');
+
+        return ShortUrl::query()
+            ->with([
+                'campaign',
+                'VisitorCountries' => function ($q) {
+                    $q->select('short_url_id', 'country')
+                        ->selectRaw('SUM(total_count) as total_count')
+                        ->groupBy('short_url_id', 'country', 'total_count')
+                        ->orderByDesc('total_count')
+                        ->limit(5);
+                },
+                'VisitorCities' => function ($q) {
+                    $q->select('short_url_id', 'city')
+                        ->selectRaw('SUM(total_count) as total_count')
+                        ->groupBy('short_url_id', 'city', 'total_count')
+                        ->orderByDesc('total_count')
+                        ->limit(5);
+                },
+            ])
+            ->when($campaign_id != -1, function ($q) use ($campaign_id) {
+                $q->where('campaign_id', $campaign_id);
+            })
+            ->whereHas('campaign', function ($q) {
+                $q->where('active', true);
+            })
+            ->paginate(25);
+    });
+
+    Route::get('/db', function (Request $request) {
 
         // $fromDate = Carbon::make($request->query('fromDate'))->format('Y-m-d');
         // $toDate = Carbon::make($request->query('toDate'))->format('Y-m-d');

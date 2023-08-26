@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Staudenmeir\EloquentEagerLimit\HasEagerLimit;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ShortUrl extends Model
 {
@@ -13,8 +14,14 @@ class ShortUrl extends Model
     use HasEagerLimit;
 
     protected $fillable = [
+        'campaign_id',
         'domain',
     ];
+
+    public function campaign(): BelongsTo
+    {
+        return $this->belongsTo(Campaign::class, 'campaign_id', 'id');
+    }
 
     public function VisitorCountries(): HasMany
     {

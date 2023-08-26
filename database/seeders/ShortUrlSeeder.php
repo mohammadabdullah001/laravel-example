@@ -2,9 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Models\Campaign;
 use App\Models\ShortUrl;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Support\Arr;
 use Illuminate\Database\Seeder;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class ShortUrlSeeder extends Seeder
 {
@@ -13,8 +15,17 @@ class ShortUrlSeeder extends Seeder
      */
     public function run(): void
     {
+        $campaign_ids =  Campaign::pluck('id')->all();
+
         ShortUrl::factory()
-            ->count(1000)
-            ->create();
+            ->count(100000)
+            ->create()
+            ->each(function ($model) use ($campaign_ids) {
+                $model->update(
+                    [
+                        'campaign_id' =>  Arr::random($campaign_ids),
+                    ]
+                );
+            });
     }
 }

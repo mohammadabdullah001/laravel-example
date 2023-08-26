@@ -40,6 +40,8 @@ class DatabaseSeeder extends Seeder
         // ]);
 
         $this->call([
+            UserSeeder::class,
+            CampaignSeeder::class,
             ShortUrlSeeder::class,
             VisitorCountrySeeder::class,
             VisitorCitySeeder::class,

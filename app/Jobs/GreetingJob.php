@@ -22,16 +22,15 @@ class GreetingJob implements ShouldQueue
      *
      * @var int
      */
-    public $tries = 1;
-
+    public $tries = 3;
 
     /**
-     * Determine the time at which the job should timeout.
+     * The maximum number of unhandled exceptions to allow before failing.
+     *
+     * @var int
      */
-    public function retryUntil(): DateTime
-    {
-        return now()->addSecond(10);
-    }
+    public $maxExceptions = 3;
+
 
     /**
      * Create a new job instance.
@@ -39,6 +38,8 @@ class GreetingJob implements ShouldQueue
     public function __construct($greeting)
     {
         $this->greeting = $greeting;
+
+        $this->onQueue('greeting');
     }
 
     /**
@@ -46,16 +47,16 @@ class GreetingJob implements ShouldQueue
      */
     public function handle(): void
     {
-        info('handle start:' . $this->greeting);
-        $records = [1, 2, 3, 4, 5, 6, 7];
+        info('start:' . $this->greeting);
+        $records = [1, 2, 3, 4, 5, 6, 7, 8];
 
         foreach ($records as $key => $value) {
-            sleep(10);
+            sleep(60);
             $array[$key] = $value;
             info('Sleep: ' . $this->greeting . '-' . $value);
         }
 
         info($array);
-        info('handle end:' . $this->greeting);
+        info('end:' . $this->greeting);
     }
 }

@@ -15,30 +15,35 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
 
-        $greeting = 'Hi';
-        $schedule->job(new GreetingJob($greeting))
-            ->name('Greeting:' . $greeting)
-            ->everyMinute()
-            ->withoutOverlapping(10)
-            ->onSuccess(function () use ($greeting) {
-                info('Success: ' . $greeting);
-            })
-            ->onFailure(function () use ($greeting) {
-                info('Failure: ' . $greeting);
-            });
+
+        $schedule->command('app:run-greeting')
+            ->dailyAt('16:03')
+            ->timezone('Asia/Dhaka');
+
+        // $greeting = 'Hi';
+        // $schedule->job(new GreetingJob($greeting))
+        //     ->name('Greeting:' . $greeting)
+        //     ->everyMinute()
+        //     ->withoutOverlapping(10)
+        //     ->onSuccess(function () use ($greeting) {
+        //         info('Success: ' . $greeting);
+        //     })
+        //     ->onFailure(function () use ($greeting) {
+        //         info('Failure: ' . $greeting);
+        //     });
 
 
-        $greeting = 'Hello';
-        $schedule->job(new GreetingJob($greeting))
-            ->name('Greeting:' . $greeting)
-            ->everyMinute()
-            ->withoutOverlapping(10)
-            ->onSuccess(function () use ($greeting) {
-                info('Success: ' . $greeting);
-            })
-            ->onFailure(function () use ($greeting) {
-                info('Failure: ' . $greeting);
-            });
+        // $greeting = 'Hello';
+        // $schedule->job(new GreetingJob($greeting))
+        //     ->name('Greeting:' . $greeting)
+        //     ->everyMinute()
+        //     ->withoutOverlapping(10)
+        //     ->onSuccess(function () use ($greeting) {
+        //         info('Success: ' . $greeting);
+        //     })
+        //     ->onFailure(function () use ($greeting) {
+        //         info('Failure: ' . $greeting);
+        //     });
     }
 
     /**

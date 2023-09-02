@@ -3,9 +3,11 @@
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\ShortUrl;
+use App\Jobs\GreetingJob;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Jobs\SortUrl\SortUrlJob;
+use App\Jobs\ValidDomainsChecker;
 use Illuminate\Support\Benchmark;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
@@ -497,5 +499,33 @@ Route::prefix('sort-urls')->group(function () {
         //     ->all();
 
         // return  $transformedData;
+    });
+});
+
+
+Route::prefix('queue-job')->group(function () {
+
+    Route::match(['PUT', 'PATCH'], '/', function (Request $request) {
+
+        $greetings = [
+            'Hi',
+            'Hello',
+            'Salaam',
+        ];
+
+        foreach ($greetings as $greeting) {
+            GreetingJob::dispatch($greeting);
+        }
+
+        return "success";
+    });
+
+    Route::match(['PUT', 'PATCH'], '/valid-domains-checker', function (Request $request) {
+
+
+        ValidDomainsChecker::dispatch();
+
+
+        return "success";
     });
 });

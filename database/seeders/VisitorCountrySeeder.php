@@ -19,7 +19,7 @@ class VisitorCountrySeeder extends Seeder
         $shortUrlIds =  ShortUrl::pluck('id')->all();
 
         VisitorCountry::factory()
-            ->count(10000)
+            ->count(100000)
             ->create()
             ->each(function ($model) use ($shortUrlIds) {
                 $model->update(

@@ -344,11 +344,16 @@ Route::prefix('sort-urls')->group(function () {
         return redirect('https://www.facebook.com');
     });
 
-    Route::get('/', function (Request $request) {
+    Route::get('/eloquent', function (Request $request) {
 
-        $campaign_id =  data_get($request->all(), 'campaign_id');
+        $campaign_id =  (int)data_get($request->all(), 'campaign_id',-1);
 
         return ShortUrl::query()
+        ->withCount([
+            'VisitorCounts as visitor_count' => function ($q) {
+                $q->selectRaw('SUM(total_count) as total_count');
+            },
+        ])
             ->with([
                 'campaign',
                 'VisitorCountries' => function ($q) {
@@ -369,13 +374,11 @@ Route::prefix('sort-urls')->group(function () {
             ->when($campaign_id != -1, function ($q) use ($campaign_id) {
                 $q->where('campaign_id', $campaign_id);
             })
-            ->whereHas('campaign', function ($q) {
-                $q->where('active', true);
-            })
+            ->orderBy('visitor_count','desc')
             ->paginate(25);
     });
 
-    Route::get('/db', function (Request $request) {
+    Route::get('/builder', function (Request $request) {
 
         // $fromDate = Carbon::make($request->query('fromDate'))->format('Y-m-d');
         // $toDate = Carbon::make($request->query('toDate'))->format('Y-m-d');

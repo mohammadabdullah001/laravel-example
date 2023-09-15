@@ -6,6 +6,7 @@ namespace Database\Seeders;
 use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Database\Seeders\VisitorCountSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -43,6 +44,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             CampaignSeeder::class,
             ShortUrlSeeder::class,
+            VisitorCountSeeder::class,
             VisitorCountrySeeder::class,
             VisitorCitySeeder::class,
         ]);

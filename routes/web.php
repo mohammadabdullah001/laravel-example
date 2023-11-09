@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use Laravel\Octane\Facades\Octane;
 
 /*
 |--------------------------------------------------------------------------
@@ -12,6 +12,13 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+
+use Illuminate\Support\Facades\Route;
+use Symfony\Component\HttpFoundation\Response;
+
+Octane::route('GET', '/faster', function () {
+    return new Response('Hello from Octane.');
+});
 
 Route::get('/', function () {
     return view('welcome');

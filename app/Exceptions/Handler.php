@@ -2,8 +2,11 @@
 
 namespace App\Exceptions;
 
-use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 
 class Handler extends ExceptionHandler
 {
@@ -23,8 +26,25 @@ class Handler extends ExceptionHandler
      */
     public function register(): void
     {
-        $this->reportable(function (Throwable $e) {
-            //
+        // $this->reportable(function (HttpException $e) {
+        //     //
+        // });
+
+        $this->renderable(function (HttpException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'message' => $e->getMessage(),
+                ], $e->getStatusCode());
+            }
+        });
+
+        $this->renderable(function (Throwable $e, Request $request) {
+
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'message' => $e->getMessage(),
+                ], $e->getCode());
+            }
         });
     }
 }

@@ -51,3 +51,164 @@ Route::get('/test', function () {
     $result = $addNumber->run(5);
     dd($result);
 });
+
+Route::get('/collection', function () {
+
+    $excel_questions = collect([
+        [
+            'title' => 'Single Question',
+            'group_name' => 'Group 1',
+            'sub_group_name' => null,
+        ],
+        [
+            'title' => 'Multiple Question',
+            'group_name' => 'Group 1',
+            'sub_group_name' => null,
+        ],
+        [
+            'title' => 'Long Question',
+            'group_name' => 'Group 1',
+            'sub_group_name' => 'Group 1 -> Sub Group 1',
+        ],
+        [
+            'title' => 'Sigle Date Question',
+            'group_name' => 'Group 1',
+            'sub_group_name' => 'Group 1 -> Sub Group 1',
+        ],
+        [
+            'title' => 'Single Question',
+            'group_name' => 'Group 2',
+            'sub_group_name' => null,
+        ],
+        [
+            'title' => 'Long Question',
+            'group_name' => 'Group 2',
+            'sub_group_name' => 'Group 2 -> Sub Group 1',
+        ],
+        [
+            'title' => 'Number Input Question',
+            'group_name' => 'Group 2',
+            'sub_group_name' => 'Group 2 -> Sub Group 2',
+        ],
+        [
+            'title' => 'Date Range Question',
+            'group_name' => 'Group 2',
+            'sub_group_name' => 'Group 2 -> Sub Group 2',
+        ],
+    ]);
+
+    $questionsGroups = collect([]);
+
+    foreach ($excel_questions as $excel_question) {
+        if (isset($excel_question['title']) && isset($excel_question['group_name'])) {
+
+            if ($questionsGroups->count() > 0) {
+                $questionsGroups->whenNotEmpty(function ($groups) use ($excel_question) {
+                    if (isset($excel_question['sub_group_name'])) {
+                        $searchedGroup =  $groups->first(function ($group) use ($excel_question) {
+                            if ($group['name'] === $excel_question['group_name']) {
+                                return $group;
+                            }
+                        });
+
+                        if ($searchedGroup) {
+
+                            $searchedSubGroup =  $searchedGroup['sub_groups']->first(function ($subGroup) use ($excel_question) {
+                                if ($subGroup['name'] === $excel_question['sub_group_name']) {
+                                    return $subGroup;
+                                }
+                            });
+
+                            if ($searchedSubGroup) {
+                                $searchedSubGroup['questions']->push(
+                                    [
+                                        'title' => $excel_question['title']
+                                    ]
+                                );
+                            } else {
+                                $searchedGroup['sub_groups']->push(collect([
+                                    'name' => $excel_question['sub_group_name'],
+                                    'questions' => collect([
+                                        [
+                                            'title' => $excel_question['title']
+                                        ],
+                                    ]),
+                                ]));
+                            }
+                        } else {
+                            $groups->push(collect([
+                                'name' => $excel_question['group_name'],
+                                'questions' => collect([]),
+                                'sub_groups' => collect([
+                                    [
+                                        'name' => $excel_question['sub_group_name'],
+                                        'questions' => collect([
+                                            [
+                                                'title' => $excel_question['title']
+                                            ],
+                                        ]),
+                                    ],
+                                ]),
+                            ]));
+                        }
+                    } else {
+                        $searchedGroup =  $groups->first(function ($group) use ($excel_question) {
+                            if ($group['name'] === $excel_question['group_name']) {
+                                return $group;
+                            }
+                        });
+
+                        if ($searchedGroup) {
+                            $searchedGroup['questions']->push(
+                                [
+                                    'title' => $excel_question['title']
+                                ]
+                            );
+                        } else {
+                            $groups->push(collect([
+                                'name' => $excel_question['group_name'],
+                                'questions' => collect([
+                                    [
+                                        'title' => $excel_question['title']
+                                    ],
+                                ]),
+                                'sub_groups' => collect([]),
+                            ]));
+                        }
+                    }
+                });
+            } else {
+                $questionsGroups->whenEmpty(function ($groups) use ($excel_question) {
+                    if (isset($excel_question['sub_group_name'])) {
+                        $groups->push(collect([
+                            'name' => $excel_question['group_name'],
+                            'questions' => collect([]),
+                            'sub_groups' => collect([
+                                [
+                                    'name' => $excel_question['sub_group_name'],
+                                    'questions' => collect([
+                                        [
+                                            'title' => $excel_question['title']
+                                        ],
+                                    ]),
+                                ],
+                            ]),
+                        ]));
+                    } else {
+                        $groups->push(collect([
+                            'name' => $excel_question['group_name'],
+                            'questions' => collect([
+                                [
+                                    'title' => $excel_question['title']
+                                ],
+                            ]),
+                            'sub_groups' => collect([]),
+                        ]));
+                    }
+                });
+            }
+        }
+    }
+
+    return response()->json($questionsGroups->values()->toArray());
+});

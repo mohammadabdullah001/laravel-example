@@ -16,10 +16,10 @@ class VisitorCountSeeder extends Seeder
     public function run(): void
     {
 
-        $shortUrlIds =  ShortUrl::pluck('id')->all();
+        $shortUrlIds =  ShortUrl::cursor()->pluck('id')->all();
 
         VisitorCount::factory()
-            ->count(100000)
+            ->count(10000)
             ->create()
             ->each(function ($model) use ($shortUrlIds) {
                 $model->update(

@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class VisitorCity extends Model
 {
-    use HasEagerLimit;
 
     use HasFactory;
 

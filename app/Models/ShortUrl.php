@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class ShortUrl extends Model
 {
     use HasFactory;
-    use HasEagerLimit;
 
     protected $fillable = [
         'campaign_id',

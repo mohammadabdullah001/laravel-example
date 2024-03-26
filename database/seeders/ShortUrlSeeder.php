@@ -15,10 +15,10 @@ class ShortUrlSeeder extends Seeder
      */
     public function run(): void
     {
-        $campaign_ids =  Campaign::pluck('id')->all();
+        $campaign_ids =  Campaign::cursor()->pluck('id')->all();
 
         ShortUrl::factory()
-            ->count(100000)
+            ->count(10)
             ->create()
             ->each(function ($model) use ($campaign_ids) {
                 $model->update(

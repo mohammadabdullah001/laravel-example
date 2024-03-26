@@ -15,10 +15,10 @@ class VisitorCitySeeder extends Seeder
      */
     public function run(): void
     {
-        $shortUrlIds =  ShortUrl::pluck('id')->all();
+        $shortUrlIds =  ShortUrl::cursor()->pluck('id')->all();
 
         VisitorCity::factory()
-            ->count(100000)
+            ->count(10000)
             ->create()
             ->each(function ($model) use ($shortUrlIds) {
                 $model->update(

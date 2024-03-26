@@ -15,6 +15,7 @@
         "laravel/tinker": "^2.8",
         "opcodesio/log-viewer": "^2.4",
         "predis/predis": "^2.2",
+        "spatie/async": "^1.6",
         "spatie/laravel-medialibrary": "^10.0.0",
         "staudenmeir/eloquent-eager-limit": "^1.0",
         "tymon/jwt-auth": "^2.0"
